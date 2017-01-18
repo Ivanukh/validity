@@ -1,0 +1,7 @@
+[MESSAGES CONTROL]
+disable=fixme, line-too-long, logging-format-interpolation, locally-disabled, missing-docstring, too-many-ancestors
+
+[SIMILARITIES]
+ignore-imports=yes
+min-similarity-lines=8
+ignore-comments=no
