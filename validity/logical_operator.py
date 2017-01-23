@@ -55,12 +55,6 @@ class Base(object):
         # pylint: disable=invalid-name
         return Not(self)
 
-    def is_valid(self, value):
-        raise NotImplementedError()
-
-    def get_condition_text(self):
-        raise NotImplementedError()
-
 
 class BaseLogicalOperator(Base):
     """

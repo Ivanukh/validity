@@ -1,6 +1,6 @@
 #pylint: skip-file
 from unittest import TestCase
-from validity.comparator import BaseComparator, GT, GTE, LT, LTE, EQ, NotEQ, Any, Between
+from validity.comparator import BaseComparator, GT, GTE, LT, LTE, EQ, NotEQ, Any, Between, TypeIs
 
 
 class TestBaseComparator(TestCase):
@@ -192,3 +192,37 @@ class TestBetween(TestCase):
         self.assertTrue(Between(10, 42).is_valid(20))
         self.assertFalse(Between(10, 42).is_valid(0))
         self.assertFalse(Between(10, 42).is_valid(50))
+
+
+class TestTypeIs(TestCase):
+
+    def test_constructor(self):
+        with self.assertRaises(TypeError):
+            TypeIs()
+
+        with self.assertRaises(TypeError):
+            TypeIs(1, 2)
+
+        with self.assertRaises(ValueError):
+            TypeIs(1)
+
+        self.assertEqual(TypeIs(int).operand, int)
+        self.assertEqual(TypeIs(str).operand, str)
+
+    def test_get_condition_text_method(self):
+        self.assertEqual(TypeIs(int).get_condition_text(), 'must be int')
+        self.assertEqual(TypeIs(str).get_condition_text(), 'must be str')
+
+    def test_is_valid_method(self):
+        self.assertTrue(TypeIs(int).is_valid(42))
+        test_variable = 42
+        self.assertTrue(TypeIs(int).is_valid(test_variable))
+        self.assertTrue(TypeIs(str).is_valid('42'))
+        self.assertTrue(TypeIs(tuple).is_valid((0, 42,)))
+        self.assertTrue(TypeIs(list).is_valid([0, 42,]))
+
+        self.assertFalse(TypeIs(int).is_valid('42'))
+        self.assertFalse(TypeIs(str).is_valid(42))
+        self.assertFalse(TypeIs(tuple).is_valid(42))
+        self.assertFalse(TypeIs(tuple).is_valid([0, 42]))
+        self.assertFalse(TypeIs(list).is_valid((0, 42,)))

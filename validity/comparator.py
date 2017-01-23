@@ -152,3 +152,17 @@ class Between(BaseComparator):
         return self._condition_template.format(min_value=self.operand[0], max_value=self.operand[1])
 
 
+class TypeIs(BaseComparator):
+    _condition_template = "must be {required_type_name}"
+
+    def __init__(self, required_type):
+        print required_type
+        if not isinstance(required_type, type):
+            raise ValueError("required_type must be instance of 'type'")
+        super(TypeIs, self).__init__(operand=required_type)
+
+    def is_valid(self, value):
+        return type(value) is self.operand
+
+    def get_condition_text(self):
+        return self._condition_template.format(required_type_name=self.operand.__name__)

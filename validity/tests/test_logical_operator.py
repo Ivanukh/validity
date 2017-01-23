@@ -1,6 +1,6 @@
 #pylint: skip-file
 from unittest import TestCase
-from validity.comparator import GT, LT, GTE, LTE, EQ, Any, Between
+from validity.comparator import GT, LT, GTE, LTE, EQ, Any, Between, TypeIs
 from validity.logical_operator import Base, BaseLogicalOperator, Or, And, Not
 
 
@@ -41,6 +41,12 @@ class TestBaseLogicalOperator(TestCase):
         with self.assertRaises(ValueError):
             BaseLogicalOperator(GT(10), 1)
 
+        cmp_1, cmp_2, cmp_3 = GT(42), GT(42), GT(42)
+        operator = BaseLogicalOperator(cmp_1, cmp_2, cmp_3)
+        self.assertEqual(operator.operands[0], cmp_1)
+        self.assertEqual(operator.operands[1], cmp_2)
+        self.assertEqual(operator.operands[2], cmp_3)
+
     def test_get_condition_text_method(self):
         self.assertEqual(BaseLogicalOperator(GT(10)).get_condition_text(),
                          'base logical operator. always falls. operands=must be greater than 10')
@@ -61,6 +67,7 @@ class TestBaseLogicalOperator(TestCase):
 class TestOr(TestCase):
 
     def test_is_valid(self):
+        # TODO: test for TypeIs
         for comparator in[GT, LT, GTE, LTE, EQ]:
             cmp_1 = comparator(10)
             cmp_2 = comparator(20)
@@ -86,6 +93,12 @@ class TestOr(TestCase):
         for value in range(0, 100):
             self.assertEqual(Or(cmp_1, cmp_2, cmp_3).is_valid(value),
                              cmp_1.is_valid(value) or cmp_2.is_valid(value) or cmp_3.is_valid(value))
+
+        cmp_1 = TypeIs(int)
+        cmp_2 = TypeIs(str)
+        for value in [42, '42', [42, ], (42, )]:
+            self.assertEqual(Or(cmp_1, cmp_2).is_valid(value),
+                             cmp_1.is_valid(value) or cmp_2.is_valid(value))
 
     def test_get_operands_text_method(self):
         self.assertEqual(Or(GT(100), LT(0)).get_operands_text(),
@@ -125,6 +138,12 @@ class TestAnd(TestCase):
             self.assertEqual(And(cmp_1, cmp_2, cmp_3).is_valid(value),
                              cmp_1.is_valid(value) and cmp_2.is_valid(value) and cmp_3.is_valid(value))
 
+        cmp_1 = TypeIs(int)
+        cmp_2 = TypeIs(int)
+        for value in [42, '42', [42, ], (42,)]:
+            self.assertEqual(And(cmp_1, cmp_2).is_valid(value),
+                             cmp_1.is_valid(value) and cmp_2.is_valid(value))
+
     def test_get_operands_text_method(self):
         self.assertEqual(And(GT(0), LT(100)).get_operands_text(),
                          'must be greater than 0 AND must be less than 100')
@@ -143,6 +162,7 @@ class TestNot(TestCase):
             Not(1, 1)
 
     def test_is_valid(self):
+        # TODO: test for TypeIs
         for comparator in[GT, LT, GTE, LTE, EQ]:
             cmp_1 = comparator(20)
             for value in range(0, 100):
@@ -150,6 +170,13 @@ class TestNot(TestCase):
                                  not cmp_1.is_valid(value))
                 self.assertEqual(cmp_1.Not().is_valid(value),
                                  not cmp_1.is_valid(value))
+
+        cmp_1 = TypeIs(int)
+        for value in [42, '42', [42, ], (42,)]:
+            self.assertEqual(Not(cmp_1).is_valid(value),
+                             not cmp_1.is_valid(value))
+            self.assertEqual(cmp_1.Not().is_valid(value),
+                             not cmp_1.is_valid(value))
 
     def test_get_operands_text_method(self):
         self.assertEqual(Not(GT(0)).get_operands_text(),
