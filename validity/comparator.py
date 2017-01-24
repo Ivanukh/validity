@@ -162,6 +162,7 @@ class TypeIs(BaseComparator):
         super(TypeIs, self).__init__(operand=required_type)
 
     def is_valid(self, value):
+        # pylint: disable=unidiomatic-typecheck
         return type(value) is self.operand
 
     def get_condition_text(self):
