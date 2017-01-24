@@ -181,3 +181,6 @@ class TestNot(TestCase):
     def test_get_operands_text_method(self):
         self.assertEqual(Not(GT(0)).get_operands_text(),
                          'must be greater than 0')
+
+    def test_get_nested_condition_method(self):
+        self.assertEqual(Not(GT(10)).get_condition_text(), Not(GT(10)).get_nested_condition())
