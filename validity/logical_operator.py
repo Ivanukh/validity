@@ -33,6 +33,9 @@ class Base(object):
         """
         raise NotImplementedError()
 
+    def get_nested_condition(self):
+        return "({})".format(self.get_condition_text())
+
     def __str__(self):
         return self.get_condition_text()
 
@@ -76,6 +79,7 @@ class BaseLogicalOperator(Base):
     def get_condition_text(self):
         return self._condition_template.format(operands=self.get_operands_text())
 
+
     def get_operands_text(self):
         return ", ".join([str(operand) for operand in self.operands])
 
@@ -84,7 +88,7 @@ class BaseLogicalOperator(Base):
 
 
 class Or(BaseLogicalOperator):
-    _condition_template = "({operands})"
+    _condition_template = "{operands}"
 
     def is_valid(self, value):
         # return any([operand.is_valid(value) for operand in self.operands])
@@ -94,17 +98,17 @@ class Or(BaseLogicalOperator):
         return False
 
     def get_operands_text(self):
-        return " OR ".join([str(operand) for operand in self.operands])
+        return " OR ".join([operand.get_nested_condition() for operand in self.operands])
 
 
 class And(BaseLogicalOperator):
-    _condition_template = "({operands})"
+    _condition_template = "{operands}"
 
     def is_valid(self, value):
         return all([operand.is_valid(value) for operand in self.operands])
 
     def get_operands_text(self):
-        return " AND ".join([str(operand) for operand in self.operands])
+        return " AND ".join([operand.get_nested_condition() for operand in self.operands])
 
 
 class Not(BaseLogicalOperator):
@@ -118,6 +122,10 @@ class Not(BaseLogicalOperator):
             if not operand.is_valid(value):
                 return True
         return False
+
+    def get_nested_condition(self):
+        return self.get_condition_text()
+
 
     def get_operands_text(self):
         return str(self.operands[0])

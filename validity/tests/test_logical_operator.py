@@ -102,10 +102,10 @@ class TestOr(TestCase):
 
     def test_get_operands_text_method(self):
         self.assertEqual(Or(GT(100), LT(0)).get_operands_text(),
-                         'must be greater than 100 OR must be less than 0')
+                         '(must be greater than 100) OR (must be less than 0)')
 
         self.assertEqual(Or(GT(100), LT(0), EQ(42)).get_operands_text(),
-                         'must be greater than 100 OR must be less than 0 OR must be equal to 42')
+                         '(must be greater than 100) OR (must be less than 0) OR (must be equal to 42)')
 
 
 class TestAnd(TestCase):
@@ -146,10 +146,10 @@ class TestAnd(TestCase):
 
     def test_get_operands_text_method(self):
         self.assertEqual(And(GT(0), LT(100)).get_operands_text(),
-                         'must be greater than 0 AND must be less than 100')
+                         '(must be greater than 0) AND (must be less than 100)')
 
         self.assertEqual(And(GT(0), LT(100), EQ(42)).get_operands_text(),
-                         'must be greater than 0 AND must be less than 100 AND must be equal to 42')
+                         '(must be greater than 0) AND (must be less than 100) AND (must be equal to 42)')
 
 
 class TestNot(TestCase):
