@@ -28,6 +28,14 @@ class TestBase(TestCase):
 
         self.assertEqual(op1.Not().operands[0], op1)
 
+    def test_filter_values(self):
+        with self.assertRaises(NotImplementedError):
+            Base().filter_values(1, 2, 3, 4, 5)
+
+        valid, not_valid = GT(10).filter_values(*range(0, 20))
+        self.assertEqual(not_valid, list(range(0, 11)))
+        self.assertEqual(valid, list(range(11, 20)))
+
 
 class TestBaseLogicalOperator(TestCase):
 

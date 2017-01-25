@@ -25,6 +25,13 @@ class Base(object):
         """
         raise NotImplementedError()
 
+    def filter_values(self, *values):
+        valid = []
+        not_valid = []
+        for value in values:
+            (valid if self.is_valid(value) else not_valid).append(value)
+        return valid, not_valid
+
     def get_condition_text(self):
         """
         get condition text representation.
