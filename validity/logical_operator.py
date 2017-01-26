@@ -5,6 +5,9 @@ class Base(object):
     Base class.
     """
 
+    def __call__(self, value):
+        return self.is_valid(value)
+
     def get_error(self, value):
         """
         check value end return error description if value is not valid.
@@ -79,7 +82,7 @@ class BaseLogicalOperator(Base):
             raise ValueError("at least one operand must be specified")
 
         if not all([isinstance(operand, Base) for operand in operands]):
-            raise ValueError("all operands mast be instances of validity.Base class")
+            raise ValueError("all operands must be instances of validity.Base class")
 
         self.operands = operands
 
