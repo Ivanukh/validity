@@ -49,9 +49,6 @@ class Base(object):
     def __str__(self):
         return self.get_condition_text()
 
-    def __unicode__(self):
-        return self.get_condition_text()
-
     def Or(self, *args):
         # pylint: disable=invalid-name
         if not len(args):

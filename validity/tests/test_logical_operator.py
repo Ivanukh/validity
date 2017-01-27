@@ -6,6 +6,14 @@ from validity.logical_operator import Base, BaseLogicalOperator, Or, And, Not
 
 class TestBase(TestCase):
 
+    def test_call_method(self):
+        with self.assertRaises(NotImplementedError):
+            Base().__call__(20)
+
+    def test_get_error_method(self):
+        with self.assertRaises(NotImplementedError):
+            Base().get_error(42)
+
     def test_Or_method(self):
         self.assertIsInstance(Base().Or(GT(10)), Or)
         op1 = GT(10)
@@ -14,6 +22,9 @@ class TestBase(TestCase):
         self.assertEqual(op1.Or(op2).operands[0], op1)
         self.assertEqual(op1.Or(op2).operands[1], op2)
 
+        with self.assertRaises(ValueError):
+            Base().Or()
+
     def test_And_method(self):
         self.assertIsInstance(Base().And(GT(10)), And)
         op1 = GT(10)
@@ -21,6 +32,9 @@ class TestBase(TestCase):
 
         self.assertEqual(op1.And(op2).operands[0], op1)
         self.assertEqual(op1.And(op2).operands[1], op2)
+
+        with self.assertRaises(ValueError):
+            Base().And()
 
     def test_Not_method(self):
         self.assertIsInstance(Base().Not(), Not)
@@ -35,6 +49,10 @@ class TestBase(TestCase):
         valid, not_valid = GT(10).filter_values(*range(0, 20))
         self.assertEqual(not_valid, list(range(0, 11)))
         self.assertEqual(valid, list(range(11, 20)))
+
+    def test_get_condition_text(self):
+        with self.assertRaises(NotImplementedError):
+            Base().get_condition_text()
 
 
 class TestBaseLogicalOperator(TestCase):

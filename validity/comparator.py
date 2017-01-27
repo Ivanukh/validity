@@ -153,10 +153,9 @@ class Between(BaseComparator):
 
 
 class TypeIs(BaseComparator):
-    _condition_template = "must be {required_type_name}"
+    _condition_template = "must be {operand}"
 
     def __init__(self, required_type):
-        print required_type
         if not isinstance(required_type, type):
             raise ValueError("required_type must be instance of 'type'")
         super(TypeIs, self).__init__(operand=required_type)
@@ -166,4 +165,28 @@ class TypeIs(BaseComparator):
         return type(value) is self.operand
 
     def get_condition_text(self):
-        return self._condition_template.format(required_type_name=self.operand.__name__)
+        return self._condition_template.format(operand=self.operand.__name__)
+
+
+class Len(BaseComparator):
+    _condition_template = "length {operand}"
+
+    def __init__(self, validator):
+        if not isinstance(validator, Base):
+            raise ValueError("validator must be instances of validity.Base class")
+
+        super(Len, self).__init__(operand=validator)
+
+    def is_valid(self, value):
+        try:
+            value_length = len(value)
+        except TypeError:
+            return False
+        return self.operand.is_valid(value_length)
+
+    def get_condition_text(self):
+        return self._condition_template.format(operand=self.operand.get_condition_text())
+
+
+class Count(Len):
+    _condition_template = "elements count {operand}"

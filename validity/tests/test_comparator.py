@@ -1,6 +1,6 @@
 #pylint: skip-file
 from unittest import TestCase
-from validity.comparator import BaseComparator, GT, GTE, LT, LTE, EQ, NotEQ, Any, Between, TypeIs
+from validity.comparator import BaseComparator, GT, GTE, LT, LTE, EQ, NotEQ, Any, Between, TypeIs, Len, Count
 
 
 class TestBaseComparator(TestCase):
@@ -226,3 +226,48 @@ class TestTypeIs(TestCase):
         self.assertFalse(TypeIs(tuple).is_valid(42))
         self.assertFalse(TypeIs(tuple).is_valid([0, 42]))
         self.assertFalse(TypeIs(list).is_valid((0, 42,)))
+
+
+class TestLen(TestCase):
+
+    def test_constructor(self):
+        with self.assertRaises(TypeError):
+            Len()
+
+        with self.assertRaises(TypeError):
+            Len(1, 2)
+
+        with self.assertRaises(ValueError):
+            Len(1)
+
+        for comparator in [GT, GTE, LT, LTE]:
+            validator = comparator(42)
+            self.assertEqual(Len(validator).operand, validator)
+
+    def test_get_condition_text_method(self):
+        self.assertEqual(Len(EQ(42)).get_condition_text(), 'length must be equal to 42')
+        self.assertEqual(Len(Between(1, 50)).get_condition_text(), 'length must be between 1 and 50')
+        self.assertEqual(Len(GT(1).And(LT(10))).get_condition_text(), 'length (must be greater than 1) AND (must be less than 10)')
+
+    def test_is_valid_method(self):
+        self.assertFalse(Len(Between(1, 5)).is_valid(''))
+        self.assertTrue(Len(Between(1, 5)).is_valid('1'))
+        self.assertTrue(Len(Between(1, 5)).is_valid('12'))
+        self.assertTrue(Len(Between(1, 5)).is_valid('12345'))
+        self.assertFalse(Len(Between(1, 5)).is_valid('123456'))
+
+        self.assertFalse(Len(Between(1, 5)).is_valid([]))
+        self.assertFalse(Len(Between(1, 5)).is_valid(1))
+        self.assertTrue(Len(Between(1, 5)).is_valid([1, ]))
+        self.assertTrue(Len(Between(1, 5)).is_valid([1, 2, 3]))
+        self.assertTrue(Len(Between(1, 5)).is_valid([1, 2, 3, 4, 5]))
+        self.assertFalse(Len(Between(1, 5)).is_valid([1, 2, 3, 4, 5, 6]))
+
+
+class TestCount(TestCase):
+
+    def test_get_condition_text_method(self):
+        self.assertEqual(Count(EQ(42)).get_condition_text(), 'elements count must be equal to 42')
+        self.assertEqual(Count(Between(1, 50)).get_condition_text(), 'elements count must be between 1 and 50')
+        self.assertEqual(Count(GT(1).And(LT(10))).get_condition_text(),
+                         'elements count (must be greater than 1) AND (must be less than 10)')
