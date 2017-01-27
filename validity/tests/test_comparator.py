@@ -193,26 +193,6 @@ class TestBetween(TestCase):
         self.assertFalse(Between(10, 42).is_valid(0))
         self.assertFalse(Between(10, 42).is_valid(50))
 
-"""
-class TestIsNone(TestCase):
-
-    def test_constructor(self):
-        self.assertIsInstance(IsNone, IsNone())
-        self.assertIsInstance(IsNone('can be none'), IsNone())
-
-    def test_is_valid_method(self):
-        self.assertFalse(IsNone().is_valid(42))
-        self.assertFalse(IsNone().is_valid('42'))
-        self.assertFalse(IsNone().is_valid([]))
-        self.assertFalse(IsNone().is_valid({}))
-        self.assertFalse(IsNone().is_valid((None, None, )))
-        self.assertTrue(IsNone().is_valid(None))
-
-    def test_get_condition_text_method(self):
-        self.assertEqual(IsNone().get_condition_text(), 'must be None')
-        self.assertEqual(IsNone('None').get_condition_text(), 'None')
-"""
-
 
 class TestTypeIs(TestCase):
 
