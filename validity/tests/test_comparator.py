@@ -193,6 +193,26 @@ class TestBetween(TestCase):
         self.assertFalse(Between(10, 42).is_valid(0))
         self.assertFalse(Between(10, 42).is_valid(50))
 
+"""
+class TestIsNone(TestCase):
+
+    def test_constructor(self):
+        self.assertIsInstance(IsNone, IsNone())
+        self.assertIsInstance(IsNone('can be none'), IsNone())
+
+    def test_is_valid_method(self):
+        self.assertFalse(IsNone().is_valid(42))
+        self.assertFalse(IsNone().is_valid('42'))
+        self.assertFalse(IsNone().is_valid([]))
+        self.assertFalse(IsNone().is_valid({}))
+        self.assertFalse(IsNone().is_valid((None, None, )))
+        self.assertTrue(IsNone().is_valid(None))
+
+    def test_get_condition_text_method(self):
+        self.assertEqual(IsNone().get_condition_text(), 'must be None')
+        self.assertEqual(IsNone('None').get_condition_text(), 'None')
+"""
+
 
 class TestTypeIs(TestCase):
 
@@ -267,7 +287,7 @@ class TestLen(TestCase):
 class TestCount(TestCase):
 
     def test_get_condition_text_method(self):
-        self.assertEqual(Count(EQ(42)).get_condition_text(), 'elements count must be equal to 42')
-        self.assertEqual(Count(Between(1, 50)).get_condition_text(), 'elements count must be between 1 and 50')
+        self.assertEqual(Count(EQ(42)).get_condition_text(), 'items count must be equal to 42')
+        self.assertEqual(Count(Between(1, 50)).get_condition_text(), 'items count must be between 1 and 50')
         self.assertEqual(Count(GT(1).And(LT(10))).get_condition_text(),
-                         'elements count (must be greater than 1) AND (must be less than 10)')
+                         'items count (must be greater than 1) AND (must be less than 10)')
