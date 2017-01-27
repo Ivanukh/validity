@@ -189,4 +189,4 @@ class Len(BaseComparator):
 
 
 class Count(Len):
-    _condition_template = "elements count {operand}"
+    _condition_template = "items count {operand}"

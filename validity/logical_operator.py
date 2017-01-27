@@ -35,6 +35,9 @@ class Base(object):
             (valid if self.is_valid(value) else not_valid).append(value)
         return valid, not_valid
 
+    def all_is_valid(self, *values):
+        return all(self.is_valid(value) for value in values)
+
     def get_condition_text(self):
         """
         get condition text representation.
