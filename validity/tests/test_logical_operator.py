@@ -50,6 +50,15 @@ class TestBase(TestCase):
         self.assertEqual(not_valid, list(range(0, 11)))
         self.assertEqual(valid, list(range(11, 20)))
 
+    def test_all_is_valid_method(self):
+        with self.assertRaises(NotImplementedError):
+            Base().all_is_valid(1, 2, 3, 4, 5)
+
+        self.assertTrue(GT(10).all_is_valid(*range(100, 110)))
+        self.assertFalse(GT(10).all_is_valid(*range(10, 20)))
+        self.assertFalse(GT(10).all_is_valid(10, 11, 12))
+        self.assertFalse(GT(10).all_is_valid(11, 20, 30, 0))
+
     def test_get_condition_text(self):
         with self.assertRaises(NotImplementedError):
             Base().get_condition_text()

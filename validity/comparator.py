@@ -168,6 +168,21 @@ class TypeIs(BaseComparator):
         return self._condition_template.format(operand=self.operand.__name__)
 
 
+class IsNone(Base):
+    _condition_text = 'must be None'
+
+    def __init__(self, condition_text=None):
+        super(IsNone, self).__init__()
+        if condition_text:
+            self._condition_text = condition_text
+
+    def is_valid(self, value):
+        return value is None
+
+    def get_condition_text(self):
+        return self._condition_text or ''
+
+
 class Len(BaseComparator):
     _condition_template = "length {operand}"
 
