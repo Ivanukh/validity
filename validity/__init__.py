@@ -13,7 +13,7 @@ __all__ = [
     'GT', 'GTE', 'LT', 'LTE', 'EQ', 'NotEQ',
     'Any',
     'Between',
-    'TypeIs', 'IsNone,'
+    'TypeIs', 'IsNone,',
     'Len', 'Count',
     # logical operators
     'Base', 'BaseLogicalOperator', 'Or', 'And', 'Not']
