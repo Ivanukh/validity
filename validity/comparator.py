@@ -146,7 +146,7 @@ class BaseComparator(Base):
         """
         # return self._condition_template.format(operand=self.operand)
         return self._condition_template.format(
-            operand=("`{}`" if isinstance(self.operand, (str, unicode)) else "{}").format(self.operand))
+            operand=("`{}`" if isinstance(self.operand, (str, )) else "{}").format(self.operand))
 
 
 class GT(BaseComparator):

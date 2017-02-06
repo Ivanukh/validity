@@ -99,7 +99,7 @@ class Base(object):
     def is_valid(self, value):
         """
         Check if given value is valid.
-        
+
         .. warning::
             At :class:`.Base` class call to :meth:`.is_valid` always raises `NotImplementedError`.
             Each child class **must** override this method
