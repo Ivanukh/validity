@@ -5,14 +5,15 @@ class BaseComparator(Base):
     """
     Base comparator class
     """
-    _condition_template = 'base comparator. operand={operand}'
+    _condition_template = 'Base comparator. operand={operand}'
     operand = None
 
     def __init__(self, operand):
         self.operand = operand
 
     def get_condition_text(self):
-        return self._condition_template.format(operand=self.operand)
+        return self._condition_template.format(
+            operand=("`{}`" if isinstance(self.operand, (str, unicode)) else "{}").format(self.operand))
 
     def is_valid(self, value):
         raise NotImplementedError("comparator must implement 'is_valid(self, value)' method")

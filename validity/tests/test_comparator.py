@@ -13,8 +13,8 @@ class TestBaseComparator(TestCase):
             BaseComparator(1, 1)
 
     def test_get_condition_text_method(self):
-        self.assertEqual(BaseComparator(None).get_condition_text(), 'base comparator. operand=None')
-        self.assertEqual(BaseComparator("test").get_condition_text(), 'base comparator. operand=test')
+        self.assertEqual(BaseComparator(None).get_condition_text(), 'Base comparator. operand=None')
+        self.assertEqual(BaseComparator("test").get_condition_text(), 'Base comparator. operand=`test`')
 
     def test_is_valid_method(self):
         with self.assertRaises(NotImplementedError):
@@ -119,6 +119,7 @@ class TestEQ(TestCase):
     def test_get_condition_text_method(self):
         self.assertEqual(EQ(10).get_condition_text(), 'must be equal to 10')
         self.assertEqual(EQ(100).get_condition_text(), 'must be equal to 100')
+        self.assertEqual(EQ('100').get_condition_text(), 'must be equal to `100`')
 
     def test_is_valid_method(self):
         self.assertFalse(EQ(10).is_valid(9))
