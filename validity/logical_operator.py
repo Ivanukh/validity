@@ -8,16 +8,6 @@ class Base(object):
     def __call__(self, value):
         return self.is_valid(value)
 
-    def get_error(self, value):
-        """
-        check value end return error description if value is not valid.
-        If value is valid returns None
-        :param value: value fo check
-        :return: None of value is valid. condition text if value is not valid
-        :rtype: None or str
-        """
-        return None if self.is_valid(value) else self.get_condition_text()
-
     def is_valid(self, value):
         """
         check if given value is valid
@@ -28,15 +18,25 @@ class Base(object):
         """
         raise NotImplementedError()
 
+    def all_is_valid(self, *values):
+        return all(self.is_valid(value) for value in values)
+
+    def get_error(self, value):
+        """
+        check value end return error description if value is not valid.
+        If value is valid returns None
+        :param value: value fo check
+        :return: None of value is valid. condition text if value is not valid
+        :rtype: None or str
+        """
+        return None if self.is_valid(value) else self.get_condition_text()
+
     def filter_values(self, *values):
         valid = []
         not_valid = []
         for value in values:
             (valid if self.is_valid(value) else not_valid).append(value)
         return valid, not_valid
-
-    def all_is_valid(self, *values):
-        return all(self.is_valid(value) for value in values)
 
     def get_condition_text(self):
         """
