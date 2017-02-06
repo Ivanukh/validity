@@ -102,7 +102,6 @@ class TestBaseLogicalOperator(TestCase):
 class TestOr(TestCase):
 
     def test_is_valid(self):
-        # TODO: test for TypeIs
         for comparator in[GT, LT, GTE, LTE, EQ]:
             cmp_1 = comparator(10)
             cmp_2 = comparator(20)
@@ -115,9 +114,9 @@ class TestOr(TestCase):
 
                 self.assertEqual(cmp_1.Or(cmp_2).Or(cmp_3).is_valid(value),
                                  cmp_1.is_valid(value) or cmp_2.is_valid(value) or cmp_3.is_valid(value))
-        cmp_1 = Between(0, 100)
+        cmp_1 = Between(0, 110)
         cmp_2 = Between(50, 150)
-        for value in range(0, 100):
+        for value in range(0, 120):
             self.assertEqual(Or(cmp_1, cmp_2).is_valid(value),
                              cmp_1.is_valid(value) or cmp_2.is_valid(value))
 
@@ -147,9 +146,9 @@ class TestAnd(TestCase):
 
     def test_is_valid(self):
         for comparator in[GT, LT, GTE, LTE, EQ]:
-            cmp_1 = comparator(10)
-            cmp_2 = comparator(20)
-            cmp_3 = comparator(30)
+            cmp_1 = comparator(5)
+            cmp_2 = comparator(15)
+            cmp_3 = comparator(35)
             for value in range(0, 100):
                 self.assertEqual(And(cmp_1, cmp_2, cmp_3).is_valid(value),
                                  cmp_1.is_valid(value) and cmp_2.is_valid(value) and cmp_3.is_valid(value))
