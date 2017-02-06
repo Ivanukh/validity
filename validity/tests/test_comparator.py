@@ -267,7 +267,7 @@ class TestLen(TestCase):
     def test_get_condition_text_method(self):
         self.assertEqual(Len(EQ(42)).get_condition_text(), 'length must be equal to 42')
         self.assertEqual(Len(Between(1, 50)).get_condition_text(), 'length must be between 1 and 50')
-        self.assertEqual(Len(GT(1).And(LT(10))).get_condition_text(), 'length (must be greater than 1) AND (must be less than 10)')
+        self.assertEqual(Len(GT(1).and_valid(LT(10))).get_condition_text(), 'length (must be greater than 1) AND (must be less than 10)')
 
     def test_is_valid_method(self):
         self.assertFalse(Len(Between(1, 5)).is_valid(''))
@@ -289,5 +289,5 @@ class TestCount(TestCase):
     def test_get_condition_text_method(self):
         self.assertEqual(Count(EQ(42)).get_condition_text(), 'items count must be equal to 42')
         self.assertEqual(Count(Between(1, 50)).get_condition_text(), 'items count must be between 1 and 50')
-        self.assertEqual(Count(GT(1).And(LT(10))).get_condition_text(),
+        self.assertEqual(Count(GT(1).and_valid(LT(10))).get_condition_text(),
                          'items count (must be greater than 1) AND (must be less than 10)')

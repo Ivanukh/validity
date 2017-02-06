@@ -52,20 +52,17 @@ class Base(object):
     def __str__(self):
         return self.get_condition_text()
 
-    def Or(self, *args):
-        # pylint: disable=invalid-name
+    def or_valid(self, *args):
         if not len(args):
             raise ValueError("at least one operand must be specified")
         return Or(self, *args)
 
-    def And(self, *args):
-        # pylint: disable=invalid-name
+    def and_valid(self, *args):
         if not len(args):
             raise ValueError("at least one operand must be specified")
         return And(self, *args)
 
-    def Not(self):
-        # pylint: disable=invalid-name
+    def invert(self):
         return Not(self)
 
 

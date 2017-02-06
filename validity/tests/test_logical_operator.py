@@ -14,33 +14,33 @@ class TestBase(TestCase):
         with self.assertRaises(NotImplementedError):
             Base().get_error(42)
 
-    def test_Or_method(self):
-        self.assertIsInstance(Base().Or(GT(10)), Or)
+    def test_or_valid_method(self):
+        self.assertIsInstance(Base().or_valid(GT(10)), Or)
         op1 = GT(10)
         op2 = GT(20)
 
-        self.assertEqual(op1.Or(op2).operands[0], op1)
-        self.assertEqual(op1.Or(op2).operands[1], op2)
+        self.assertEqual(op1.or_valid(op2).operands[0], op1)
+        self.assertEqual(op1.or_valid(op2).operands[1], op2)
 
         with self.assertRaises(ValueError):
-            Base().Or()
+            Base().or_valid()
 
-    def test_And_method(self):
-        self.assertIsInstance(Base().And(GT(10)), And)
+    def test_and_valid_method(self):
+        self.assertIsInstance(Base().and_valid(GT(10)), And)
         op1 = GT(10)
         op2 = GT(20)
 
-        self.assertEqual(op1.And(op2).operands[0], op1)
-        self.assertEqual(op1.And(op2).operands[1], op2)
+        self.assertEqual(op1.and_valid(op2).operands[0], op1)
+        self.assertEqual(op1.and_valid(op2).operands[1], op2)
 
         with self.assertRaises(ValueError):
-            Base().And()
+            Base().and_valid()
 
-    def test_Not_method(self):
-        self.assertIsInstance(Base().Not(), Not)
+    def test_invert_method(self):
+        self.assertIsInstance(Base().invert(), Not)
         op1 = GT(10)
 
-        self.assertEqual(op1.Not().operands[0], op1)
+        self.assertEqual(op1.invert().operands[0], op1)
 
     def test_filter_values(self):
         with self.assertRaises(NotImplementedError):
@@ -109,10 +109,10 @@ class TestOr(TestCase):
             for value in range(0, 100):
                 self.assertEqual(Or(cmp_1, cmp_2, cmp_3).is_valid(value),
                                  cmp_1.is_valid(value) or cmp_2.is_valid(value) or cmp_3.is_valid(value))
-                self.assertEqual(cmp_1.Or(cmp_2, cmp_3).is_valid(value),
+                self.assertEqual(cmp_1.or_valid(cmp_2, cmp_3).is_valid(value),
                                  cmp_1.is_valid(value) or cmp_2.is_valid(value) or cmp_3.is_valid(value))
 
-                self.assertEqual(cmp_1.Or(cmp_2).Or(cmp_3).is_valid(value),
+                self.assertEqual(cmp_1.or_valid(cmp_2).or_valid(cmp_3).is_valid(value),
                                  cmp_1.is_valid(value) or cmp_2.is_valid(value) or cmp_3.is_valid(value))
         cmp_1 = Between(0, 110)
         cmp_2 = Between(50, 150)
@@ -152,10 +152,10 @@ class TestAnd(TestCase):
             for value in range(0, 100):
                 self.assertEqual(And(cmp_1, cmp_2, cmp_3).is_valid(value),
                                  cmp_1.is_valid(value) and cmp_2.is_valid(value) and cmp_3.is_valid(value))
-                self.assertEqual(cmp_1.And(cmp_2, cmp_3).is_valid(value),
+                self.assertEqual(cmp_1.and_valid(cmp_2, cmp_3).is_valid(value),
                                  cmp_1.is_valid(value) and cmp_2.is_valid(value) and cmp_3.is_valid(value))
 
-                self.assertEqual(cmp_1.And(cmp_2).And(cmp_3).is_valid(value),
+                self.assertEqual(cmp_1.and_valid(cmp_2).and_valid(cmp_3).is_valid(value),
                                  cmp_1.is_valid(value) and cmp_2.is_valid(value) and cmp_3.is_valid(value))
 
         cmp_1 = Between(0, 100)
@@ -202,14 +202,14 @@ class TestNot(TestCase):
             for value in range(0, 100):
                 self.assertEqual(Not(cmp_1).is_valid(value),
                                  not cmp_1.is_valid(value))
-                self.assertEqual(cmp_1.Not().is_valid(value),
+                self.assertEqual(cmp_1.invert().is_valid(value),
                                  not cmp_1.is_valid(value))
 
         cmp_1 = TypeIs(int)
         for value in [42, '42', [42, ], (42,)]:
             self.assertEqual(Not(cmp_1).is_valid(value),
                              not cmp_1.is_valid(value))
-            self.assertEqual(cmp_1.Not().is_valid(value),
+            self.assertEqual(cmp_1.invert().is_valid(value),
                              not cmp_1.is_valid(value))
 
     def test_get_operands_text_method(self):
