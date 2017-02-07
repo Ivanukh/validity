@@ -3,9 +3,9 @@
 All of comparators are inherited from :class:`.BaseComparator`.
 
 This means that any of :ref:`available_comparators` has
-:meth:`.or_valid`,
-:meth:`.and_valid`,
-:meth:`.invert` **methods**,
+:meth:`.Base.or_valid`,
+:meth:`.Base.and_valid`,
+:meth:`.Base.invert` **methods**,
 that warp's comparator in :ref:`available_logical_operators`, so it is possible to building validators like this::
 
     EQ(42).or_valid(EQ(33))  # same as Or(EQ(42), (EQ(33))
@@ -13,9 +13,23 @@ that warp's comparator in :ref:`available_logical_operators`, so it is possible 
 
 Also they inherits other useful methods:
 
-    - :meth:`.all_is_valid`
-    - :meth:`.get_error`
-    - :meth:`.filter_values`
+    - common validation methods:
+
+        - :meth:`.all_is_valid`
+        - :meth:`.get_error`
+        - :meth:`.filter_values`
+
+    - logical wrappers:
+
+        - :meth:`~.Base.or_valid`
+        - :meth:`~.Base.and_valid`
+        - :meth:`~.Base.invert`
+
+    - binary logic operations:
+
+        - **|**  ( :meth:`~.Base.__or__` )
+        - **&**  (:meth:`~.Base.__and__` )
+        - **~**  ( :meth:`~.Base.__invert__` )
 
 
 .. _available_comparators:
@@ -92,7 +106,7 @@ class BaseComparator(Base):
         >>>
         >>> cmp_2 = IsDividableFor(2).or_valid(IsDividableFor(3).and_valid(NotEQ(9))).or_valid(EQ(7))
         >>> print cmp_2
-        ((value must be dividable by 2) OR ((value must be dividable by 3) AND (must NOT be equal to 9))) OR (must be equal to 7)
+        (value must be dividable by 2) OR ((value must be dividable by 3) AND (must NOT be equal to 9)) OR (must be equal to 7)
         >>> cmp_2.filter_values(*range(1,20))
         ([2, 3, 4, 6, 7, 8, 10, 12, 14, 15, 16, 18], [1, 5, 9, 11, 13, 17, 19])
 
@@ -152,7 +166,7 @@ class BaseComparator(Base):
 class GT(BaseComparator):
     """
     **Greater then comparator.**
-    Use it for check that value > :attr:`.operand`.
+    Use it for check that value > :attr:`operand`.
 
     example::
 
@@ -186,10 +200,10 @@ class GT(BaseComparator):
 
     def is_valid(self, value):
         """
-        Check if given `value` is greater than :attr:`.operand`
+        Check if given `value` is greater than :attr:`operand`
 
         :param value: value for check
-        :return: True if `value` > self.operand** else False
+        :return: True if `value` > **self.operand** else False
         :rtype: bool
         """
         return value > self.operand
@@ -198,15 +212,15 @@ class GT(BaseComparator):
 class GTE(BaseComparator):
     """
     **Greater then or equal to comparator.**
-    Use it for check that value >= :attr:`.operand`.
+    Use it for check that value >= :attr:`operand`.
 
     Example::
 
         >>> from validity import GTE
         >>>
-        >>> GTE(10).is_valid(20)  # check if 20 is greater than 10
+        >>> GTE(10).is_valid(20)  # check if 20 is greater than or equal to 10
         True
-        >>> GTE(10).is_valid(10)  # check if 20 is greater than 10
+        >>> GTE(10).is_valid(10)  # check if 20 is greater than or equal to 10
         True
         >>> test = GTE(42)
         >>> test.get_condition_text()  # get text condition that describes comparator
@@ -222,20 +236,19 @@ class GTE(BaseComparator):
 
     def is_valid(self, value):
         """
-        Check if given `value` is greater than or equal to :attr:`.operand`
+        Check if given `value` is greater than or equal to :attr:`operand`
 
         :param value: value for check
-        :return: True if `value` >= self.operand** else False
+        :return: True if `value` >= **self.operand** else False
         :rtype: bool
         """
-
         return value >= self.operand
 
 
 class LT(BaseComparator):
     """
     **Less then comparator.**
-    Use it for check that value < :attr:`.operand`.
+    Use it for check that value < :attr:`operand`.
 
     example::
 
@@ -268,10 +281,10 @@ class LT(BaseComparator):
 
     def is_valid(self, value):
         """
-        Check if given `value` is less than :attr:`.operand`
+        Check if given `value` is less than :attr:`operand`
 
         :param value: value for check
-        :return: True if `value` < self.operand** else False
+        :return: True if `value` < **self.operand** else False
         :rtype: bool
         """
         return value < self.operand
@@ -279,37 +292,67 @@ class LT(BaseComparator):
 
 class LTE(BaseComparator):
     """
-    less then or equal comparator
-    use it for check that value <= operand
+    **Less then or equal to comparator.**
+    Use it for check that value <= :attr:`operand`.
 
-    :example:
+    Example::
 
-    LTE(10).is_valid(50)  # False
-    LTE(10).get_error(50) # must be less than or equal to 10
+        >>> from validity import LTE
+        >>>
+        >>> LTE(10).is_valid(20)  # check if 20 is less than or equal to 10
+        False
+        >>> LTE(10).is_valid(10)  # check if 20 is less than or equal to 10
+        True
+        >>> test = LTE(42)
+        >>> test.get_condition_text()  # get text condition that describes comparator
+        'must be less than or equal to 42'
+        >>>
+        >>> test.filter_values(*range(40, 50))
+        ([40, 41, 42], [43, 44, 45, 46, 47, 48, 49])
+
     """
 
     _condition_template = "must be less than or equal to {operand}"
+    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
     def is_valid(self, value):
+        """
+        Check if given `value` is less than or equal to :attr:`operand`
+
+        :param value: value for check
+        :return: True if `value` <= **self.operand** else False
+        :rtype: bool
+        """
         return value <= self.operand
 
 
 class EQ(BaseComparator):
     """
-    equal comparator
-    use it for check that value = operand
+    **Equal to comparator**
+    Use it for check that value == operand
 
-    :example:
+    Example::
 
-    EQ(10).is_valid(50)  # False
-    EQ(10).get_error(50) # must be equal to 10
+        >>> from validity import EQ
+        >>>
+        >>> EQ(10).is_valid(50)
+        False
+        >>> print EQ(10).get_error(50)
+        must be equal to 10
+        >>> print EQ(10).get_error(10)
+        None
+        >>> valid, not_valid = EQ(42).filter_values(*range(40, 45))
+        >>> print valid
+        [42]
+        >>> print not_valid
+        [40, 41, 43, 44]
+        >>> print EQ(42) | EQ('forty two')
+        (must be equal to 42) OR (must be equal to `forty two`)
 
-    .. TODO::
-
-        add .ignore_case(self) method
 
     """
     _condition_template = "must be equal to {operand}"
+    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
     def is_valid(self, value):
         return value == self.operand
@@ -327,16 +370,23 @@ class NotEQ(BaseComparator):
     """
 
     _condition_template = "must NOT be equal to {operand}"
+    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
     def is_valid(self, value):
+        """
+        Check if given `value` is equal to :attr:`operand`
+
+        :param value: value for check
+        :return: True if `value` == **self.operand** else False
+        :rtype: bool
+        """
         return not value == self.operand
 
 
 class Any(BaseComparator):
-    # TODO: rename to In ?
-    # TODO: tests
 
     _condition_template = "must be any of ({operands})"
+    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
     def __init__(self, *values):
         if len(values) == 1 and isinstance(values[0], (list, tuple)):
@@ -356,6 +406,7 @@ class Any(BaseComparator):
 
 class Between(BaseComparator):
     _condition_template = "must be between {min_value} and {max_value}"
+    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
     def __init__(self, min_value, max_value):
         super(Between, self).__init__(operand=(min_value, max_value))
@@ -369,6 +420,7 @@ class Between(BaseComparator):
 
 class TypeIs(BaseComparator):
     _condition_template = "must be {operand}"
+    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
     def __init__(self, required_type):
         if not isinstance(required_type, type):
@@ -383,11 +435,12 @@ class TypeIs(BaseComparator):
         return self._condition_template.format(operand=self.operand.__name__)
 
 
-class IsNone(Base):
+class IsNone(BaseComparator):
     _condition_text = 'must be None'
+    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
     def __init__(self, condition_text=None):
-        super(IsNone, self).__init__()
+        super(IsNone, self).__init__(None)
         if condition_text:
             self._condition_text = condition_text
 
@@ -400,6 +453,7 @@ class IsNone(Base):
 
 class Len(BaseComparator):
     _condition_template = "length {operand}"
+    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
     def __init__(self, validator):
         if not isinstance(validator, Base):
@@ -420,3 +474,4 @@ class Len(BaseComparator):
 
 class Count(Len):
     _condition_template = "items count {operand}"
+    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
