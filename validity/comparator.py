@@ -721,6 +721,7 @@ class Count(Len):
     _condition_template = "items count {operand}"
     """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
+    '''
     def is_valid(self, value):
         """
         Check if given value has length that is valid for :attr:`operand`.
@@ -736,3 +737,4 @@ class Count(Len):
         except TypeError:
             return False
         return self.operand.is_valid(value_length)
+    '''
