@@ -361,12 +361,21 @@ class EQ(BaseComparator):
 class NotEQ(BaseComparator):
     """
     NOT equal comparator
-    use it for check that value <> operand
+    Use it for check that value <> operand
 
-    :example:
+    Example::
 
-    NotEQ(10).is_valid(10)  # False
-    NotEQ(10).get_error(10) # must NOT be equal to 10
+        >>> from validity import  NotEQ, Between
+        >>>
+        >>> NotEQ(10).is_valid(10)
+        False
+        >>> print NotEQ(10).get_error(10)
+        must NOT be equal to 10
+        >>> NotEQ(10).get_error(11)
+        >>>
+        >>> print Between(0, 20) & NotEQ(10) & NotEQ(11)
+        (must be between 0 and 20) AND (must NOT be equal to 10) AND (must NOT be equal to 11)
+
     """
 
     _condition_template = "must NOT be equal to {operand}"
@@ -374,29 +383,70 @@ class NotEQ(BaseComparator):
 
     def is_valid(self, value):
         """
-        Check if given `value` is equal to :attr:`operand`
+        Check if given `value` is not equal to :attr:`operand`
 
         :param value: value for check
-        :return: True if `value` == **self.operand** else False
+        :return: True if `not value` == **self.operand** else False
         :rtype: bool
         """
         return not value == self.operand
 
 
 class Any(BaseComparator):
+    """
+    **Any from list** comparator.
+    Checks if given value is in list of allowed values.
 
+    Example::
+
+        >>> from validity import  Any
+        >>>
+        >>> print Any(10, 11, 12)
+        must be any of (10, 11, 12)
+        >>> allowed_values = [10, 11, 12]
+        >>> print Any(allowed_values)  # same as Any(*allowed_values)
+        must be any of (10, 11, 12)
+        >>> Any("42", 42, "forty two").is_valid(42)
+        True
+        >>> Any("42", 42, "forty two").is_valid(-42)
+        False
+        >>> print Any(range(1, 5))
+        must be any of (1, 2, 3, 4)
+
+    """
     _condition_template = "must be any of ({operands})"
     """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
     def __init__(self, *values):
+        """
+        :param values: allowed values. If given only one value and it is instance of list or tuple, then it is used as list of valid values.
+        :type values: list, tuple
+        :raises ~exceptions.ValueError: if no validators specified
+
+        """
         if len(values) == 1 and isinstance(values[0], (list, tuple)):
             values = values[0]
         super(Any, self).__init__(operand=values)
 
     def is_valid(self, value):
+        """
+        Check if given value in :attr:`operand`.
+
+        :param value: value for check
+        :return: True if value if list of allowed values, otherwise False
+        :rtype: bool
+        """
         return value in self.operand
 
     def get_condition_text(self):
+        """
+        Get condition text representation.
+        Formats :attr:`._condition_template` with :attr:`operand` and returns result.
+        Allowed  values are joined with coma.
+
+        :return: condition text representation
+        :rtype: str
+        """
         return self._condition_template.format(operands=", ".join(str(item) for item in self.operand))
 
 # just aliases
