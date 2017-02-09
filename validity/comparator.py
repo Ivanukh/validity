@@ -425,7 +425,11 @@ class Any(BaseComparator):
 
         """
         if len(values) == 1 and isinstance(values[0], (list, tuple)):
+            if not values[0]:
+                raise ValueError("at least one value must be specified")
             values = values[0]
+        elif not values:
+            raise ValueError("at least one value must be specified")
         super(Any, self).__init__(operand=values)
 
     def is_valid(self, value):
@@ -455,16 +459,60 @@ class Any(BaseComparator):
 
 
 class Between(BaseComparator):
+    """
+    **Between min_value and max_value comparator.**
+    Use it for check that min_value <= value <= max_value.
+    min_value and max_value res stored in :attr:`operand` as tuple (min_value, max_value)
+
+    Example::
+
+        >>> from validity import Between
+        >>>
+        >>> Between(10, 20).is_valid(20)  # check if 20 is between 10 and 20
+        True
+        >>> Between(10, 20).is_valid(0)  # check if 0 is between 10 and 20
+        False
+        >>> test = Between(40, 42)
+        >>> test.get_condition_text()  # get text condition that describes comparator
+        'must be between 40 and 42'
+        >>>
+        >>> test.filter_values(*range(38, 45))
+        ([40, 41, 42], [38, 39, 43, 44])
+
+    """
     _condition_template = "must be between {min_value} and {max_value}"
     """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
     def __init__(self, min_value, max_value):
+        """
+        *min_value* and *max_value* res stored in :attr:`operand` as tuple (min_value, max_value)
+
+        :param min_value: minimum available value
+        :type min_value: int
+        :param max_value: maximum available value
+        :type max_value: int
+        """
         super(Between, self).__init__(operand=(min_value, max_value))
 
     def is_valid(self, value):
+        """
+        Check that min_value <= value <= max_value.
+        min_value and max_value res stored in :attr:`operand` as tuple (min_value, max_value)
+
+        :param value: value for check
+        :return: True if :attr:`operand` [0] <= value <= :attr:`operand` [1], otherwise False
+        :rtype: bool
+        """
         return self.operand[0] <= value <= self.operand[1]
 
     def get_condition_text(self):
+        """
+        Get condition text representation.
+        Formats :attr:`._condition_template` with min_value and max_value, stored as tuple in :attr:`operand`.
+
+        :return: validation condition text representation
+        :rtype: str
+        """
         return self._condition_template.format(min_value=self.operand[0], max_value=self.operand[1])
 
 

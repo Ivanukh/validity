@@ -148,6 +148,11 @@ class TestNotEQ(TestCase):
 class TestAny(TestCase):
 
     def test_constructor(self):
+        with self.assertRaises(ValueError):
+            Any()
+        with self.assertRaises(ValueError):
+            Any([])
+
         self.assertEqual(Any(1).operand[0], 1)
         self.assertEqual(len(Any(1).operand), 1)
 
