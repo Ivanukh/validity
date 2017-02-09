@@ -1,6 +1,6 @@
 #pylint: skip-file
 from unittest import TestCase
-from validity.comparator import GT, LT, GTE, LTE, EQ, Any, Between, TypeIs
+from validity.comparator import GT, LT, GTE, LTE, EQ, NotEQ, Any, Between, TypeIs
 from validity.logical_operator import Base, BaseLogicalOperator, Or, And, Not
 
 
@@ -25,6 +25,15 @@ class TestBase(TestCase):
         with self.assertRaises(ValueError):
             Base().or_valid()
 
+    def test_binary_or_method(self):
+        self.assertIsInstance(Base() | Base(), Or)
+        op1 = GT(10)
+        op2 = GT(20)
+        op3 = op1 | op2
+        self.assertIsInstance(op3, Or)
+        self.assertEqual(op3.operands[0], op1)
+        self.assertEqual(op3.operands[1], op2)
+
     def test_and_valid_method(self):
         self.assertIsInstance(Base().and_valid(GT(10)), And)
         op1 = GT(10)
@@ -36,11 +45,26 @@ class TestBase(TestCase):
         with self.assertRaises(ValueError):
             Base().and_valid()
 
+    def test_binary_and_method(self):
+        self.assertIsInstance(Base() & Base(), And)
+        op1 = GT(10)
+        op2 = GT(20)
+        op3 = op1 & op2
+        self.assertIsInstance(op3, And)
+        self.assertEqual(op3.operands[0], op1)
+        self.assertEqual(op3.operands[1], op2)
+
     def test_invert_method(self):
         self.assertIsInstance(Base().invert(), Not)
         op1 = GT(10)
 
         self.assertEqual(op1.invert().operands[0], op1)
+
+    def test_binary_invert_method(self):
+        self.assertIsInstance(~Base(), Not)
+        op1 = GT(10)
+
+        self.assertEqual((~op1).operands[0], op1)
 
     def test_filter_values(self):
         with self.assertRaises(NotImplementedError):
@@ -141,6 +165,24 @@ class TestOr(TestCase):
         self.assertEqual(Or(GT(100), LT(0), EQ(42)).get_operands_text(),
                          '(must be greater than 100) OR (must be less than 0) OR (must be equal to 42)')
 
+    def test_binary_or_method(self):
+        self.assertIsInstance(Or(GT(10), LT(0)) | EQ(42), Or)
+        op1 = GT(10)
+        op2 = LT(0)
+        op3 = EQ(42)
+
+        op4 = Or(op1, op2) | op3
+
+        self.assertIsInstance(op4, Or)
+        self.assertEqual(op4.operands[0], op1)
+        self.assertEqual(op4.operands[1], op2)
+        self.assertEqual(op4.operands[2], op3)
+        self.assertEqual(op4.get_condition_text(),
+                         '(must be greater than 10) OR (must be less than 0) OR (must be equal to 42)')
+
+        with self.assertRaises(ValueError):
+            Or(GT(10), LT(0)).or_valid()
+
 
 class TestAnd(TestCase):
 
@@ -184,6 +226,24 @@ class TestAnd(TestCase):
 
         self.assertEqual(And(GT(0), LT(100), EQ(42)).get_operands_text(),
                          '(must be greater than 0) AND (must be less than 100) AND (must be equal to 42)')
+
+    def test_binary_and_method(self):
+        self.assertIsInstance(And(GT(40), LT(50)) & NotEQ(42), And)
+        op1 = GT(40)
+        op2 = LT(50)
+        op3 = NotEQ(42)
+
+        op4 = And(op1, op2) & op3
+
+        self.assertIsInstance(op4, And)
+        self.assertEqual(op4.operands[0], op1)
+        self.assertEqual(op4.operands[1], op2)
+        self.assertEqual(op4.operands[2], op3)
+        self.assertEqual(op4.get_condition_text(),
+                         '(must be greater than 40) AND (must be less than 50) AND (must NOT be equal to 42)')
+
+        with self.assertRaises(ValueError):
+            And(LT(10), GT(0)).and_valid()
 
 
 class TestNot(TestCase):
