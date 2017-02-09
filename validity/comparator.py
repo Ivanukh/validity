@@ -415,7 +415,7 @@ class Any(BaseComparator):
 
     """
     _condition_template = "must be any of ({operands})"
-    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
+    """used for creating text representation of comparator (:py:meth:`get_condition_text`)"""
 
     def __init__(self, *values):
         """
@@ -481,7 +481,7 @@ class Between(BaseComparator):
 
     """
     _condition_template = "must be between {min_value} and {max_value}"
-    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
+    """used for creating text representation of comparator (:py:meth:`get_condition_text`)"""
 
     def __init__(self, min_value, max_value):
         """
@@ -517,59 +517,222 @@ class Between(BaseComparator):
 
 
 class TypeIs(BaseComparator):
+    """
+    **Value type comparator**
+    Use it for check that value type is same as :attr:`operand`.
+
+    Example::
+
+        >>> from validity import TypeIs
+        >>>
+        >>> TypeIs(int).is_valid(20)  # check if type of `20` is int
+        True
+        >>> TypeIs(list).is_valid([1, 2, 3, 4, 5, False])
+        True
+        >>> TypeIs(int).is_valid('1')
+        False
+        >>> test = TypeIs(int) | TypeIs(str)
+        >>> test.get_condition_text()  # get text condition that describes comparator
+        '(must be int) OR (must be str)'
+        >>> test.filter_values(1, 2, [1,2,3], '1', {'test': 'test'}, (1, 2))
+        ([1, 2, '1'], [[1, 2, 3], {'test': 'test'}, (1, 2)])
+
+    """
+
     _condition_template = "must be {operand}"
-    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
+    """used for creating text representation of comparator (:py:meth:`get_condition_text`)"""
 
     def __init__(self, required_type):
+        """
+        required_type is stored in :attr:`operand`.
+
+        :param required_type: type to compare with
+        :type required_type: type
+        :raises ~exceptions.ValueError: if required_type is not instance of :class:`type`
+        """
         if not isinstance(required_type, type):
             raise ValueError("required_type must be instance of 'type'")
         super(TypeIs, self).__init__(operand=required_type)
 
     def is_valid(self, value):
+        """
+        Check if type of given value is same as :attr:`operand`
+
+        :param value: value to check
+        :return: True if value has type same as :attr:`operand`, otherwise False
+        :rtype: bool
+        """
         # pylint: disable=unidiomatic-typecheck
         return type(value) is self.operand
 
     def get_condition_text(self):
+        """
+        Get condition text representation.
+        Formats :attr:`._condition_template` with name of type, stored in :attr:`operand` and returns result.
+
+        :return: condition text representation
+        :rtype: str
+        """
         return self._condition_template.format(operand=self.operand.__name__)
 
 
 class IsNone(BaseComparator):
+    """
+    **Check that value is None**
+
+    Example::
+
+        >>> from validity import IsNone
+        >>>
+        >>> IsNone().is_valid(20)  # check if type of `20` is int
+        False
+        >>> IsNone().is_valid([])
+        False
+        >>> IsNone().is_valid(None)
+        True
+        >>> print IsNone()
+        must be None
+        >>> test = IsNone("there is not sense to be not None")
+        >>> print test.get_condition_text()
+        there is not sense to be not None
+        >>> test.filter_values(1, '2', 3, 4, 5, None, 6, [], {})
+        ([None], [1, '2', 3, 4, 5, 6, [], {}])
+        >>> (~test).filter_values(1, '2', 3, 4, 5, None, 6, [], {})
+        ([1, '2', 3, 4, 5, 6, [], {}], [None])
+
+    """
+
     _condition_text = 'must be None'
-    """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
+    """used for creating text representation of comparator (:py:meth:`get_condition_text`)"""
 
     def __init__(self, condition_text=None):
+        """
+        It is possible to override default test representation with custom text from param condition_text
+
+        :param condition_text: if given, default text representation will be overrided with it.
+        :type condition_text:  str
+        """
         super(IsNone, self).__init__(None)
         if condition_text:
             self._condition_text = condition_text
 
     def is_valid(self, value):
+        """
+        Check if given value is None
+
+        :param value: value to check
+        :return: True if value is None, otherwise False
+        :rtype: bool
+        """
         return value is None
 
     def get_condition_text(self):
+        """
+        Get condition text representation.
+        It is possible to override default test representation while creating comparator (see :meth:`__init__`).
+
+        :return: condition text representation
+        :rtype: str
+        """
         return self._condition_text or ''
 
 
 class Len(BaseComparator):
+    """
+    Length validator.
+
+    Example::
+
+        >>> from validity import Len, GT, LT, EQ, Between
+        >>>
+        >>> print Len(Between(2, 5))
+        length must be between 2 and 5
+        >>> test = Len(Between(2, 5) | EQ(7))
+        >>> print test
+        length (must be between 2 and 5) OR (must be equal to 7)
+        >>> test.is_valid("123")
+        True
+        >>> test.is_valid(123)
+        False
+        >>> print test | EQ("some extra unique possible value")
+        (length (must be between 2 and 5) OR (must be equal to 7)) OR (must be equal to `some extra unique possible value`)
+        >>> test |= Any("extra_const_value_1", "42", "other_possible_value")
+        >>> test.filter_values('a', 'abc', '123456', '42')
+        (['abc', '42'], ['a', '123456'])
+
+    """
     _condition_template = "length {operand}"
     """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
 
     def __init__(self, validator):
+        """
+        validator is stored in :attr:`operand`
+
+        :param validator: any validator that will be used while validating value
+        :type validator: Base
+        :raises ~exceptions.ValueError: if validator is not instance of Base
+        """
         if not isinstance(validator, Base):
             raise ValueError("validator must be instances of validity.Base class")
 
         super(Len, self).__init__(operand=validator)
 
     def is_valid(self, value):
+        """
+        Check if given value has length that is valid for :attr:`operand`.
+        First step is to get value length. If length for value can not be calculated (for example, type of value is int), False is returned.
+        Second step is to check if value length is valid for validator, sotred in :attr:`operand` (see :meth:`__init__`)
+
+        :param value: value for length validation
+        :return: True if length of value is valid for :attr:`operand` (see :meth:`__init__`), otherwise False
+        :rtype: bool
+        """
         try:
             value_length = len(value)
         except TypeError:
             return False
         return self.operand.is_valid(value_length)
 
-    def get_condition_text(self):
-        return self._condition_template.format(operand=self.operand.get_condition_text())
-
 
 class Count(Len):
+    """
+    Count validator.
+    Same as len, except :attr:`_condition_template`
+    # TODO: return False if string given for check.
+
+    Example::
+
+        >>> from validity import Count, GT, LT, EQ, Between
+        >>>
+        >>> print Count(Between(2, 5))
+        items count must be between 2 and 5
+        >>> test = Count(Between(2, 5) | EQ(7))
+        >>> print test
+        items count (must be between 2 and 5) OR (must be equal to 7)
+        >>> test.is_valid([1, 2, 3])
+        True
+        >>> test.is_valid([1, ])
+        False
+        >>> test.filter_values(['a', 'b'], ['a', 'b', 'c'], ['1', '2', '3', '4', '5', '6'])
+        ([['a', 'b'], ['a', 'b', 'c']], [['1', '2', '3', '4', '5', '6']])
+
+    """
+
     _condition_template = "items count {operand}"
     """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
+
+    def is_valid(self, value):
+        """
+        Check if given value has length that is valid for :attr:`operand`.
+        First step is to get value length. If length for value can not be calculated (for example, type of value is int), False is returned.
+        Second step is to check if value length is valid for validator, sotred in :attr:`operand` (see :meth:`__init__`)
+
+        :param value: value for length validation
+        :return: True if length of value is valid for :attr:`operand` (see :meth:`__init__`), otherwise False
+        :rtype: bool
+        """
+        try:
+            value_length = len(value)
+        except TypeError:
+            return False
+        return self.operand.is_valid(value_length)
