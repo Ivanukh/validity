@@ -2,7 +2,7 @@
 About
 =====
 
-Validity is module for validation created to help implement primitive and complex validation rules.
+Validity is module for validation, created to help implement primitive and complex validation rules.
 It implements :ref:`comparators` and :ref:`logical_operators`.
 More details is in :ref:`intro` section.
 
@@ -23,7 +23,7 @@ To install an official release with pip simply use pip command:
 Dependencies
 ------------
 
-**Module has no external dependencies**, but some modules required for **building documentation and coverage results**:
+**Module has no external dependencies**, but some modules required to **build documentation and coverage results**:
 
     - `sphinx <https://pypi.python.org/pypi/Sphinx>`_.
     - `sphinx_rtd_theme==0.1.9 <https://pypi.python.org/pypi/sphinx_rtd_theme/0.1.9>`_.
@@ -65,7 +65,11 @@ Tests and stability
 
 Validity module is covered with standard `python Unit testing framework <https://docs.python.org/2/library/unittest.html>`_.
 
-Also `travis-ci <https://travis-ci.org/Ivanukh/validity/builds>`_. used for automatic builds and tests.
+Documentation is build with `sphinx-doc <http://www.sphinx-doc.org/en/stable/>`_ from sources docstrings.
+
+All examples in documentation are tested with `doctest <https://docs.python.org/2/library/doctest.html>`_.
+
+`Travis-ci <https://travis-ci.org/Ivanukh/validity/builds>`_. used for automatic builds and tests.
 
 
 .. seealso:: :ref:`PyLint results <PyLint>`

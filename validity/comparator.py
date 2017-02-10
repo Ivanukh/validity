@@ -698,7 +698,6 @@ class Count(Len):
     """
     Count validator.
     Same as len, except :attr:`_condition_template`
-    # TODO: return False if string given for check.
 
     Example::
 
@@ -720,21 +719,3 @@ class Count(Len):
 
     _condition_template = "items count {operand}"
     """used for creating text representation of comparator (:py:meth:`.BaseComparator.get_condition_text`)"""
-
-    '''
-    def is_valid(self, value):
-        """
-        Check if given value has length that is valid for :attr:`operand`.
-        First step is to get value length. If length for value can not be calculated (for example, type of value is int), False is returned.
-        Second step is to check if value length is valid for validator, sotred in :attr:`operand` (see :meth:`__init__`)
-
-        :param value: value for length validation
-        :return: True if length of value is valid for :attr:`operand` (see :meth:`__init__`), otherwise False
-        :rtype: bool
-        """
-        try:
-            value_length = len(value)
-        except TypeError:
-            return False
-        return self.operand.is_valid(value_length)
-    '''
