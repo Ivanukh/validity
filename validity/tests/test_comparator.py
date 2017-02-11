@@ -209,7 +209,7 @@ class TestTypeIs(TestCase):
         with self.assertRaises(TypeError):
             TypeIs(1, 2)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             TypeIs(1)
 
         self.assertEqual(TypeIs(int).operand, int)

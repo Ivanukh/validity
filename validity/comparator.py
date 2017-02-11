@@ -548,10 +548,10 @@ class TypeIs(BaseComparator):
 
         :param required_type: type to compare with
         :type required_type: type
-        :raises ~exceptions.ValueError: if required_type is not instance of :class:`type`
+        :raises ~exceptions.TypeError: if required_type is not instance of :class:`type`
         """
         if not isinstance(required_type, type):
-            raise ValueError("required_type must be instance of 'type'")
+            raise TypeError("required_type must be instance of 'type'")
         super(TypeIs, self).__init__(operand=required_type)
 
     def is_valid(self, value):
